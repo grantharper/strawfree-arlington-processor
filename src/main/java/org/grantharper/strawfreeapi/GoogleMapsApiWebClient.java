@@ -7,11 +7,20 @@ import com.google.maps.errors.ApiException;
 import com.google.maps.model.FindPlaceFromText;
 import com.google.maps.model.LatLng;
 import com.google.maps.model.PlacesSearchResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
+@Service
 public class GoogleMapsApiWebClient {
 
+
+    private static final Logger logger = LoggerFactory.getLogger(GoogleMapsApiWebClient.class);
     static final String API_KEY;
     public static final LatLng CENTER_OF_ARLINGTON = new LatLng(38.8816792, -77.1020571);
 
@@ -35,7 +44,7 @@ public class GoogleMapsApiWebClient {
         geoApiContext = new GeoApiContext.Builder().apiKey(API_KEY).build();
     }
 
-    public void searchBusinessName(String businessName) {
+    public PlacesSearchResult[] searchBusinessName(String businessName) {
         FindPlaceFromTextRequest request = PlacesApi.findPlaceFromText(geoApiContext, businessName, FindPlaceFromTextRequest.InputType.TEXT_QUERY);
         request.fields(FindPlaceFromTextRequest.FieldMask.FORMATTED_ADDRESS, FindPlaceFromTextRequest.FieldMask.GEOMETRY,
                 FindPlaceFromTextRequest.FieldMask.NAME, FindPlaceFromTextRequest.FieldMask.PLACE_ID);
@@ -49,12 +58,12 @@ public class GoogleMapsApiWebClient {
             for (PlacesSearchResult searchResult : result.candidates) {
                 System.out.println(searchResult);
             }
-        } catch (ApiException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            return result.candidates;
+        } catch (ApiException | InterruptedException | IOException e) {
+            logger.error("Error calling Google Maps API", e);
         }
+        return null;
     }
+
+
 }

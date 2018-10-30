@@ -1,14 +1,12 @@
 package org.grantharper.strawfreeapi;
 
+import com.google.maps.model.PlacesSearchResult;
 import lombok.Data;
-
-import java.util.List;
 
 @Data
 public class MapApiResponse {
 
     private String name;
-    private int starCount;
-    private List<Double> coordinates;
+    private PlacesSearchResult[] placesSearchResults;
 
 }
