@@ -64,14 +64,25 @@ public class GoogleMapsApiWebClient {
         }
     }
 
-    public LatLng locateAddress(String address) {
+    LatLngResponse getLatLngFromAddress(String address) {
+        LatLng latLng = locateAddress(address);
+        LatLngResponse latLngResponse = new LatLngResponse();
+        latLngResponse.setLat(latLng.lat);
+        latLngResponse.setLng(latLng.lng);
+        return latLngResponse;
+    }
+
+    LatLng locateAddress(String address) {
+        logger.debug("searching address=" + address);
         GeocodingApiRequest geocodingApiRequest = GeocodingApi.geocode(geoApiContext, address);
         try {
             GeocodingResult[] geocodingResults = geocodingApiRequest.await();
             if (geocodingResults.length != 1) {
                 throw new RuntimeException("geocodingResults returned with length=" + geocodingResults.length);
             }
-            return geocodingResults[0].geometry.location;
+            LatLng location = geocodingResults[0].geometry.location;
+            logger.debug("lat=" + location.lat + ", lng=" + location.lng);
+            return location;
         } catch (ApiException | InterruptedException | IOException e) {
             logger.error("Error calling Google Maps API", e);
             throw new RuntimeException("kill process");

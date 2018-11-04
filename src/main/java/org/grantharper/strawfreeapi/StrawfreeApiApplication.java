@@ -6,8 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import reactor.core.publisher.Flux;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 
 @SpringBootApplication
@@ -22,12 +20,17 @@ public class StrawfreeApiApplication {
 
     @Bean
     public Function<Flux<String>, Flux<String>> uppercase() {
-        return flux -> flux.map(value -> value.toUpperCase());
+        return flux -> flux.map(String::toUpperCase);
     }
 
     @Bean
-    public Function<Flux<String>, Flux<MapApiResponse>> call() {
+    public Function<Flux<String>, Flux<MapApiResponse>> businessName() {
         return (flux -> flux.map(processBusinessName()));
+    }
+
+    @Bean
+    public Function<Flux<String>, Flux<LatLngResponse>> address() {
+        return (addressFlux -> addressFlux.map(address -> googleMapsApiWebClient.getLatLngFromAddress(address)));
     }
 
     private Function<String, MapApiResponse> processBusinessName() {
