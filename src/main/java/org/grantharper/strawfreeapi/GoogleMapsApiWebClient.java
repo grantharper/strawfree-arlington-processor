@@ -2,7 +2,10 @@ package org.grantharper.strawfreeapi;
 
 import com.google.maps.*;
 import com.google.maps.errors.ApiException;
-import com.google.maps.model.*;
+import com.google.maps.model.FindPlaceFromText;
+import com.google.maps.model.GeocodingResult;
+import com.google.maps.model.LatLng;
+import com.google.maps.model.PlacesSearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -57,22 +60,21 @@ public class GoogleMapsApiWebClient {
             return result.candidates;
         } catch (ApiException | InterruptedException | IOException e) {
             logger.error("Error calling Google Maps API", e);
+            throw new RuntimeException("kill process");
         }
-        return null;
     }
 
-    public void locateAddress(String address) {
+    public LatLng locateAddress(String address) {
         GeocodingApiRequest geocodingApiRequest = GeocodingApi.geocode(geoApiContext, address);
         try {
-            GeocodingResult[] result = geocodingApiRequest.await();
-            for (GeocodingResult searchResult : result) {
-                System.out.println(searchResult);
-                System.out.println(searchResult.geometry);
-                Geometry geometry = searchResult.geometry;
-                System.out.println("lat=" + geometry.location.lat + ", long=" + geometry.location.lng);
+            GeocodingResult[] geocodingResults = geocodingApiRequest.await();
+            if (geocodingResults.length != 1) {
+                throw new RuntimeException("geocodingResults returned with length=" + geocodingResults.length);
             }
+            return geocodingResults[0].geometry.location;
         } catch (ApiException | InterruptedException | IOException e) {
             logger.error("Error calling Google Maps API", e);
+            throw new RuntimeException("kill process");
         }
 
     }
