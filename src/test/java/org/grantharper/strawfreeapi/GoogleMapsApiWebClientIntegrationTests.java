@@ -14,5 +14,10 @@ public class GoogleMapsApiWebClientIntegrationTests {
 
     }
 
+    @Test
+    public void testAddressGeolocation() {
+        googleMapsApiWebClient.locateAddress("501 E Monroe Ave, Alexandria, VA 22301");
+    }
+
 
 }

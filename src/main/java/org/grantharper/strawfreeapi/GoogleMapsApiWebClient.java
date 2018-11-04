@@ -1,12 +1,8 @@
 package org.grantharper.strawfreeapi;
 
-import com.google.maps.FindPlaceFromTextRequest;
-import com.google.maps.GeoApiContext;
-import com.google.maps.PlacesApi;
+import com.google.maps.*;
 import com.google.maps.errors.ApiException;
-import com.google.maps.model.FindPlaceFromText;
-import com.google.maps.model.LatLng;
-import com.google.maps.model.PlacesSearchResult;
+import com.google.maps.model.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -63,6 +59,22 @@ public class GoogleMapsApiWebClient {
             logger.error("Error calling Google Maps API", e);
         }
         return null;
+    }
+
+    public void locateAddress(String address) {
+        GeocodingApiRequest geocodingApiRequest = GeocodingApi.geocode(geoApiContext, address);
+        try {
+            GeocodingResult[] result = geocodingApiRequest.await();
+            for (GeocodingResult searchResult : result) {
+                System.out.println(searchResult);
+                System.out.println(searchResult.geometry);
+                Geometry geometry = searchResult.geometry;
+                System.out.println("lat=" + geometry.location.lat + ", long=" + geometry.location.lng);
+            }
+        } catch (ApiException | InterruptedException | IOException e) {
+            logger.error("Error calling Google Maps API", e);
+        }
+
     }
 
 
